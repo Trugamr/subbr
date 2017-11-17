@@ -3,10 +3,23 @@ const SubDB = require('subdb');
 const guessit = require('guessit-wrapper');
 const subdb = new SubDB();
 const remote = require('electron').remote;
+const {dialog} = require('electron').remote;
 
 const dropbox = document.getElementById('dropbox');
 const main = document.getElementById('main');
+const filesbtn = document.getElementById('file');
 
+filesbtn.addEventListener('change', function(e) {
+    dropbox.innerHTML = '<i style="font-size: 80px;" class="fa fa-circle-o-notch fa-spin"></i>';
+    for (let f of e.target.files) {
+        guessit.parseName(f.name).then(function (data) {
+            subByHash(f, data, (err, res)=> {
+                createElement(res);
+                console.log(res);
+            })
+        });
+    }
+})
 
 document.getElementById("close-btn").addEventListener("click", function (e) {
     console.log();
@@ -17,7 +30,7 @@ document.getElementById("close-btn").addEventListener("click", function (e) {
 document.addEventListener('drop', function (e) {
     e.preventDefault();
     e.stopPropagation();
-    dropbox.innerHTML = '<i style="font-size: 80px;" class="fa fa-circle-o-notch fa-spin"></i>'
+    dropbox.innerHTML = '<i style="font-size: 80px;" class="fa fa-circle-o-notch fa-spin"></i>';
     for (let f of e.dataTransfer.files) {
         guessit.parseName(f.name).then(function (data) {
             subByHash(f, data, (err, res)=> {
